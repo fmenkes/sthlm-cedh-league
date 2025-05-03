@@ -12,20 +12,20 @@ export function meta({}: Route.MetaArgs) {
 export async function loader({ context, request }: Route.LoaderArgs) {
   const { supabase } = createClient(request);
 
-  const { data: leagues } = await supabase.from("leagues").select();
+  const { data: seasons } = await supabase.from("season").select();
 
-  return { message: context.VALUE_FROM_NETLIFY, leagues };
+  return { message: context.VALUE_FROM_NETLIFY, seasons };
 }
 
 export default function Home({ loaderData }: Route.ComponentProps) {
-  const { leagues } = loaderData;
+  const { seasons } = loaderData;
 
   return (
     <main className="pt-16 p-4 container mx-auto">
-      <h1 className="text-4xl mb-4">Leagues</h1>
-      {(leagues || []).map((league) => (
-        <div key={league.id}>
-          <Link to={`/leagues/${league.id}`} className="underline text-blue-600 visited:text-purple-600">{league.name}</Link>
+      <h1 className="text-4xl mb-4">Seasons</h1>
+      {(seasons || []).map((season) => (
+        <div key={season.id}>
+          <Link to={`/seasons/${season.id}`} className="underline text-blue-600 visited:text-purple-600">{season.name}</Link>
         </div>
       ))}
     </main>

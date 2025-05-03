@@ -9,7 +9,97 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      leagues: {
+      game: {
+        Row: {
+          created_at: string
+          draw: boolean
+          id: number
+          played_at: string | null
+          season: number | null
+          winner: number | null
+        }
+        Insert: {
+          created_at?: string
+          draw?: boolean
+          id?: number
+          played_at?: string | null
+          season?: number | null
+          winner?: number | null
+        }
+        Update: {
+          created_at?: string
+          draw?: boolean
+          id?: number
+          played_at?: string | null
+          season?: number | null
+          winner?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_season_fkey"
+            columns: ["season"]
+            isOneToOne: false
+            referencedRelation: "season"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_winner_fkey"
+            columns: ["winner"]
+            isOneToOne: false
+            referencedRelation: "player"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      game_player: {
+        Row: {
+          game_id: number
+          player_id: number
+        }
+        Insert: {
+          game_id: number
+          player_id: number
+        }
+        Update: {
+          game_id?: number
+          player_id?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_player_game_id_fkey"
+            columns: ["game_id"]
+            isOneToOne: false
+            referencedRelation: "game"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_player_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      player: {
+        Row: {
+          created_at: string
+          id: number
+          name: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: number
+          name?: string | null
+        }
+        Relationships: []
+      }
+      season: {
         Row: {
           created_at: string
           ends_at: string | null

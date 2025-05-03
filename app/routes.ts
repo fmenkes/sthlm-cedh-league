@@ -4,5 +4,5 @@ export default [
   index("routes/home.tsx"),
   route("login", "routes/login.tsx"),
   route("auth/confirm", "routes/auth/confirm.tsx"),
-  route("leagues/:leagueId", "routes/league.tsx"),
+  route("seasons/:seasonId", "routes/season.tsx"),
 ] satisfies RouteConfig;
