@@ -1,8 +1,24 @@
-import { type RouteConfig, index, route } from "@react-router/dev/routes";
+import {
+  type RouteConfig,
+  index,
+  layout,
+  route,
+  prefix,
+} from "@react-router/dev/routes";
 
 export default [
-  index("routes/home.tsx"),
-  route("login", "routes/login.tsx"),
+  layout("layouts/topnav.tsx", [
+    index("routes/home.tsx"),
+    route("login", "routes/login.tsx"),
+    route("players", "routes/players.tsx"),
+    route("report", "routes/report.tsx"),
+    ...prefix("seasons", [
+      index("routes/seasons/index.tsx"),
+      route(":seasonId", "routes/seasons/season.tsx"),
+    ]),
+  ]),
+  route("auth/mail-sent", "routes/auth/mail-sent.tsx"),
   route("auth/confirm", "routes/auth/confirm.tsx"),
-  route("seasons/:seasonId", "routes/season.tsx"),
+  route("auth/error", "routes/auth/error.tsx"),
+  route("logout", "routes/logout.tsx"),
 ] satisfies RouteConfig;

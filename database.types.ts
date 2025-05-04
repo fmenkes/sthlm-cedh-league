@@ -49,6 +49,13 @@ export type Database = {
             referencedRelation: "player"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "game_winner_fkey"
+            columns: ["winner"]
+            isOneToOne: false
+            referencedRelation: "player_win_loss_draw_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       game_player: {
@@ -77,6 +84,13 @@ export type Database = {
             columns: ["player_id"]
             isOneToOne: false
             referencedRelation: "player"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_player_player_id_fkey"
+            columns: ["player_id"]
+            isOneToOne: false
+            referencedRelation: "player_win_loss_draw_view"
             referencedColumns: ["id"]
           },
         ]
@@ -125,7 +139,16 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      player_win_loss_draw_view: {
+        Row: {
+          draws: number | null
+          id: number | null
+          losses: number | null
+          name: string | null
+          wins: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       [_ in never]: never

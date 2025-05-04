@@ -9,13 +9,12 @@ export async function loader({ request }: LoaderFunctionArgs) {
   if (hash) {
     const { error } = await supabase.auth.verifyOtp({
       token_hash: hash,
-      type: 'email',
-    })
+      type: "email",
+    });
     if (!error) {
       return redirect("/", { headers });
     }
   }
-  
 
   return redirect("/auth/error", { headers });
 }
