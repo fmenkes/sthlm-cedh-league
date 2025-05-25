@@ -4,6 +4,8 @@ import type { User } from "@supabase/supabase-js";
 import { useFetcher, redirect, useOutletContext } from "react-router";
 import { useState } from "react";
 import dayjs from "dayjs";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/style.css";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { supabase } = createClient(request);
@@ -13,14 +15,19 @@ export async function loader({ request }: Route.LoaderArgs) {
     .select()
     .order("name");
 
-  return { players };
+  const { data: seasons } = await supabase
+    .from("season")
+    .select("id, name")
+    .order("starts_at", { ascending: false });
+
+  return { players, seasons };
 }
 
 export async function action({ request }: Route.ActionArgs) {
   const data = await request.json();
 
   const { supabase } = createClient(request);
-  const { newPlayers, existingPlayers, winner, draw } = data;
+  const { newPlayers, existingPlayers, winner, draw, season, played_at } = data;
 
   if (newPlayers.length + existingPlayers.length !== 4) {
     return new Response("You must select 4 players", {
@@ -46,8 +53,6 @@ export async function action({ request }: Route.ActionArgs) {
         status: 500,
       });
     }
-    console.log(winner);
-    console.log(newPlayerData);
     if (typeof winner === "string") {
       winnerId = newPlayerData.find((player) => player.name === winner)?.id;
     }
@@ -60,8 +65,8 @@ export async function action({ request }: Route.ActionArgs) {
     .insert({
       winner: winnerId,
       draw,
-      season: 1,
-      played_at: dayjs().format("YYYY-MM-DD"),
+      season,
+      played_at,
     })
     .select();
 
@@ -84,12 +89,14 @@ export async function action({ request }: Route.ActionArgs) {
     });
   }
 
-  return redirect("/seasons");
+  return new Response(null, {
+    status: 204,
+  });
 }
 
 // scuffed but will do for now
 export default function Report({ loaderData }: Route.ComponentProps) {
-  const { players } = loaderData;
+  const { players, seasons } = loaderData;
   const fetcher = useFetcher();
   const { user } = useOutletContext<{ user: User }>();
   const [selectedPlayers, setSelectedPlayers] = useState<{
@@ -118,6 +125,8 @@ export default function Report({ loaderData }: Route.ComponentProps) {
   });
   const [winner, setWinner] = useState<number | null>(null);
   const [draw, setDraw] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
+  const [season, setSeason] = useState<number>(seasons?.[0]?.id || 1);
   const [error, setError] = useState<string | null>(null);
 
   if (!user) {
@@ -129,6 +138,29 @@ export default function Report({ loaderData }: Route.ComponentProps) {
       </main>
     );
   }
+
+  const clearForm = () => {
+    setSelectedPlayers({
+      0: null,
+      1: null,
+      2: null,
+      3: null,
+    });
+    setNewPlayerChecked({
+      0: false,
+      1: false,
+      2: false,
+      3: false,
+    });
+    setNewPlayerNames({
+      0: "",
+      1: "",
+      2: "",
+      3: "",
+    });
+    setWinner(null);
+    setDraw(false);
+  };
 
   const handleSubmit = async () => {
     const newPlayers = [];
@@ -154,24 +186,70 @@ export default function Report({ loaderData }: Route.ComponentProps) {
       return;
     }
 
-    fetcher.submit(
+    await fetcher.submit(
       {
         newPlayers,
         existingPlayers,
-        winner: winner ? newPlayerNames[winner] || selectedPlayers[winner] : null,
+        winner: winner
+          ? newPlayerNames[winner] || selectedPlayers[winner]
+          : null,
         draw,
+        season,
+        played_at: dayjs(selectedDate).format("YYYY-MM-DD"),
       },
       {
         method: "POST",
         encType: "application/json",
       }
     );
+
+    clearForm();
   };
 
   return (
     <main className="pt-16 p-4 container mx-auto">
       <h1 className="text-4xl mb-4">Report game</h1>
       <div className="grid grid-cols-4 gap-4">
+        <div>
+          <button
+            popoverTarget="rdp-popover"
+            className="input input-border"
+            style={{ anchorName: "--rdp" } as React.CSSProperties}
+          >
+            {selectedDate ? selectedDate.toLocaleDateString() : "Pick a date"}
+          </button>
+          <div
+            popover="auto"
+            id="rdp-popover"
+            className="dropdown"
+            style={{ positionAnchor: "--rdp" } as React.CSSProperties}
+          >
+            <DayPicker
+              className="react-day-picker"
+              mode="single"
+              selected={selectedDate}
+              onSelect={(date) => setSelectedDate(date ?? new Date())}
+              required={false}
+            />
+          </div>
+        </div>
+        <div>
+          <select
+            className="select w-full"
+            onChange={(e) => setSeason(parseInt(e.target.value))}
+            value={`${season || ""}`}
+          >
+            <option value="" disabled>
+              Select a season
+            </option>
+            {seasons?.map((season) => (
+              <option key={season.id} value={season.id}>
+                {season.name}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="col-span-2" />
         <h1 className="col-span-2">Player name</h1>
         <div />
         <h1>Winner?</h1>
@@ -217,16 +295,12 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className="btn swap">
-          <input
-            type="checkbox"
-            onChange={() => {
-              setNewPlayerChecked((players) => ({
-                ...players,
-                0: !players[0],
-              }));
-            }}
-          />
+        <label className={`btn swap ${newPlayerChecked[0] ? "swap-active" : ""}`} onClick={() => {
+          setNewPlayerChecked((players) => ({
+            ...players,
+            0: !players[0],
+          }));
+        }}>
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -278,16 +352,12 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className="btn swap">
-          <input
-            type="checkbox"
-            onChange={() => {
-              setNewPlayerChecked((players) => ({
-                ...players,
-                1: !players[1],
-              }));
-            }}
-          />
+        <label className={`btn swap ${newPlayerChecked[1] ? "swap-active" : ""}`} onClick={() => {
+          setNewPlayerChecked((players) => ({
+            ...players,
+            1: !players[1],
+          }));
+        }}>
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -339,16 +409,12 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className="btn swap">
-          <input
-            type="checkbox"
-            onChange={() => {
-              setNewPlayerChecked((players) => ({
-                ...players,
-                2: !players[2],
-              }));
-            }}
-          />
+        <label className={`btn swap ${newPlayerChecked[2] ? "swap-active" : ""}`} onClick={() => {
+          setNewPlayerChecked((players) => ({
+            ...players,
+            2: !players[2],
+          }));
+        }}>
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -400,16 +466,12 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className="btn swap">
-          <input
-            type="checkbox"
-            onChange={() => {
-              setNewPlayerChecked((players) => ({
-                ...players,
-                3: !players[3],
-              }));
-            }}
-          />
+        <label className={`btn swap ${newPlayerChecked[3] ? "swap-active" : ""}`} onClick={() => {
+          setNewPlayerChecked((players) => ({
+            ...players,
+            3: !players[3],
+          }));
+        }}>
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
