@@ -190,8 +190,8 @@ export default function Report({ loaderData }: Route.ComponentProps) {
       {
         newPlayers,
         existingPlayers,
-        winner: winner
-          ? newPlayerNames[winner] || selectedPlayers[winner]
+        winner: winner !== null
+          ? (newPlayerNames[winner] || selectedPlayers[winner])
           : null,
         draw,
         season,
@@ -210,10 +210,10 @@ export default function Report({ loaderData }: Route.ComponentProps) {
     <main className="pt-16 p-4 container mx-auto">
       <h1 className="text-4xl mb-4">Report game</h1>
       <div className="grid grid-cols-4 gap-4">
-        <div>
+        <div className="col-span-4 md:col-span-1">
           <button
             popoverTarget="rdp-popover"
-            className="input input-border"
+            className="input input-border w-full"
             style={{ anchorName: "--rdp" } as React.CSSProperties}
           >
             {selectedDate ? selectedDate.toLocaleDateString() : "Pick a date"}
@@ -233,7 +233,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             />
           </div>
         </div>
-        <div>
+        <div className="col-span-4 md:col-span-1">
           <select
             className="select w-full"
             onChange={(e) => setSeason(parseInt(e.target.value))}
@@ -249,7 +249,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             ))}
           </select>
         </div>
-        <div className="col-span-2" />
+        <div className="hidden md:col-span-2 md:block" />
         <h1 className="col-span-2">Player name</h1>
         <div />
         <h1>Winner?</h1>

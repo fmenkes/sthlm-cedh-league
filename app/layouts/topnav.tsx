@@ -17,7 +17,7 @@ export default function TopNav({ loaderData }: Route.ComponentProps) {
 
   return (
     <>
-      <nav className="navbar bg-gray-800">
+      <nav className="navbar bg-gray-800 text-sm md:text-base">
         <div className="container mx-auto flex justify-between items-center px-4">
           <ul className="flex space-x-4">
             <li>
