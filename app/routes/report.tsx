@@ -495,7 +495,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             Draw?
           </label>
         </div>
-        <button className="btn btn-neutral" onClick={handleSubmit}>
+        <button className="btn btn-neutral" disabled={fetcher.state !== "idle"} onClick={handleSubmit}>
           Submit
         </button>
       </div>
