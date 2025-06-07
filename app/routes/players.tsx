@@ -16,7 +16,7 @@ export default function Players({ loaderData }: Route.ComponentProps) {
   const { players } = loaderData;
 
   return (
-    <main className="pt-16 p-4 container mx-auto">
+    <main className="pt-16 p-4 container mx-auto overflow-auto">
       <table className="table">
         <thead>
           <tr>
