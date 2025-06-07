@@ -21,7 +21,7 @@ export type Database = {
         Insert: {
           created_at?: string
           draw?: boolean
-          id?: number
+          id?: never
           played_at?: string | null
           season?: number | null
           winner?: number | null
@@ -29,7 +29,7 @@ export type Database = {
         Update: {
           created_at?: string
           draw?: boolean
-          id?: number
+          id?: never
           played_at?: string | null
           season?: number | null
           winner?: number | null
@@ -99,17 +99,17 @@ export type Database = {
         Row: {
           created_at: string
           id: number
-          name: string | null
+          name: string
         }
         Insert: {
           created_at?: string
-          id?: number
-          name?: string | null
+          id?: never
+          name: string
         }
         Update: {
           created_at?: string
-          id?: number
-          name?: string | null
+          id?: never
+          name?: string
         }
         Relationships: []
       }
@@ -124,14 +124,14 @@ export type Database = {
         Insert: {
           created_at?: string
           ends_at?: string | null
-          id?: number
+          id?: never
           name?: string | null
           starts_at?: string | null
         }
         Update: {
           created_at?: string
           ends_at?: string | null
-          id?: number
+          id?: never
           name?: string | null
           starts_at?: string | null
         }
@@ -142,9 +142,11 @@ export type Database = {
       player_win_loss_draw_view: {
         Row: {
           draws: number | null
+          games_played: number | null
           id: number | null
           losses: number | null
           name: string | null
+          win_percentage: number | null
           wins: number | null
         }
         Relationships: []
