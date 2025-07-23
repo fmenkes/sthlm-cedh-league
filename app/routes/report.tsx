@@ -46,7 +46,7 @@ export async function action({ request }: Route.ActionArgs) {
   if (newPlayers.length > 0) {
     const { data: newPlayerData, error: newPlayerError } = await supabase
       .from("player")
-      .insert(newPlayers.map((name: string) => ({ name })))
+      .insert(newPlayers.map((player: { name: string }) => ({ name: player.name })))
       .select();
     if (newPlayerError) {
       return new Response(newPlayerError.message, {
@@ -56,7 +56,7 @@ export async function action({ request }: Route.ActionArgs) {
     if (typeof winner === "string") {
       winnerId = newPlayerData.find((player) => player.name === winner)?.id;
     }
-    const newPlayerIds = newPlayerData.map((player) => player.id);
+    const newPlayerIds = newPlayerData.map((player) => ({ name: player.id, seat: newPlayers.find((p: { name: string }) => p.name === player.name)?.seat }));
     allPlayers = [...existingPlayers, ...newPlayerIds];
   }
 
@@ -77,9 +77,10 @@ export async function action({ request }: Route.ActionArgs) {
   }
 
   const { error } = await supabase.from("game_player").insert(
-    allPlayers.map((playerId: number) => ({
-      player_id: playerId,
+    allPlayers.map((player: { name: number, seat: number }) => ({
+      player_id: player.name,
       game_id: gameData?.[0].id,
+      seat: player.seat,
     }))
   );
 
@@ -166,12 +167,13 @@ export default function Report({ loaderData }: Route.ComponentProps) {
     const newPlayers = [];
     const existingPlayers = [];
     for (const [key, checked] of Object.entries(newPlayerChecked)) {
+      const keyInt = parseInt(key);
       if (checked) {
-        newPlayers.push(newPlayerNames[parseInt(key)]);
+        newPlayers.push({ seat: keyInt + 1, name: newPlayerNames[keyInt] });
       } else {
-        const player = selectedPlayers[parseInt(key)];
+        const player = selectedPlayers[keyInt];
         if (player) {
-          existingPlayers.push(selectedPlayers[parseInt(key)]);
+          existingPlayers.push({ seat: keyInt + 1, name: selectedPlayers[keyInt] });
         }
       }
     }
@@ -190,9 +192,10 @@ export default function Report({ loaderData }: Route.ComponentProps) {
       {
         newPlayers,
         existingPlayers,
-        winner: winner !== null
-          ? (newPlayerNames[winner] || selectedPlayers[winner])
-          : null,
+        winner:
+          winner !== null
+            ? newPlayerNames[winner] || selectedPlayers[winner]
+            : null,
         draw,
         season,
         played_at: dayjs(selectedDate).format("YYYY-MM-DD"),
@@ -276,7 +279,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
               value={`${selectedPlayers[0] || ""}`}
             >
               <option disabled value="">
-                Player 1
+                Seat 1
               </option>
               {players
                 ?.filter(
@@ -295,12 +298,15 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className={`btn swap ${newPlayerChecked[0] ? "swap-active" : ""}`} onClick={() => {
-          setNewPlayerChecked((players) => ({
-            ...players,
-            0: !players[0],
-          }));
-        }}>
+        <label
+          className={`btn swap ${newPlayerChecked[0] ? "swap-active" : ""}`}
+          onClick={() => {
+            setNewPlayerChecked((players) => ({
+              ...players,
+              0: !players[0],
+            }));
+          }}
+        >
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -333,7 +339,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
               value={`${selectedPlayers[1] || ""}`}
             >
               <option value="" disabled>
-                Player 2
+                Seat 2
               </option>
               {players
                 ?.filter(
@@ -352,12 +358,15 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className={`btn swap ${newPlayerChecked[1] ? "swap-active" : ""}`} onClick={() => {
-          setNewPlayerChecked((players) => ({
-            ...players,
-            1: !players[1],
-          }));
-        }}>
+        <label
+          className={`btn swap ${newPlayerChecked[1] ? "swap-active" : ""}`}
+          onClick={() => {
+            setNewPlayerChecked((players) => ({
+              ...players,
+              1: !players[1],
+            }));
+          }}
+        >
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -390,7 +399,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
               value={`${selectedPlayers[2] || ""}`}
             >
               <option disabled value="">
-                Player 3
+                Seat 3
               </option>
               {players
                 ?.filter(
@@ -409,12 +418,15 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className={`btn swap ${newPlayerChecked[2] ? "swap-active" : ""}`} onClick={() => {
-          setNewPlayerChecked((players) => ({
-            ...players,
-            2: !players[2],
-          }));
-        }}>
+        <label
+          className={`btn swap ${newPlayerChecked[2] ? "swap-active" : ""}`}
+          onClick={() => {
+            setNewPlayerChecked((players) => ({
+              ...players,
+              2: !players[2],
+            }));
+          }}
+        >
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -447,7 +459,7 @@ export default function Report({ loaderData }: Route.ComponentProps) {
               value={`${selectedPlayers[3] || ""}`}
             >
               <option disabled value="">
-                Player 4
+                Seat 4
               </option>
               {players
                 ?.filter(
@@ -466,12 +478,15 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             </select>
           )}
         </div>
-        <label className={`btn swap ${newPlayerChecked[3] ? "swap-active" : ""}`} onClick={() => {
-          setNewPlayerChecked((players) => ({
-            ...players,
-            3: !players[3],
-          }));
-        }}>
+        <label
+          className={`btn swap ${newPlayerChecked[3] ? "swap-active" : ""}`}
+          onClick={() => {
+            setNewPlayerChecked((players) => ({
+              ...players,
+              3: !players[3],
+            }));
+          }}
+        >
           <span className="swap-off">New</span>
           <span className="swap-on">Existing</span>
         </label>
@@ -495,7 +510,11 @@ export default function Report({ loaderData }: Route.ComponentProps) {
             Draw?
           </label>
         </div>
-        <button className="btn btn-neutral" disabled={fetcher.state !== "idle"} onClick={handleSubmit}>
+        <button
+          className="btn btn-neutral"
+          disabled={fetcher.state !== "idle"}
+          onClick={handleSubmit}
+        >
           Submit
         </button>
       </div>

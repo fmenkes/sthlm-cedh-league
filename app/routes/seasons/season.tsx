@@ -24,7 +24,8 @@ export async function loader({ params, request }: Route.LoaderArgs) {
         played_at,
         winner ( id, name ),
         game_player (
-          player ( id, name )
+          player ( id, name ),
+          seat
         )
       )
     `
@@ -86,12 +87,14 @@ export default function Season({ loaderData }: Route.ComponentProps) {
         <div key={game.id} className="mt-4">
           <h2 className="text-2xl mb-2">{game.played_at}</h2>
           <ul className="mb-2">
-            {game.game_player.map((gamePlayer) => (
-              <li key={gamePlayer.player.id}>
-                {gamePlayer.player.id === game.winner?.id && "🏆 "}
-                {gamePlayer.player.name}
-              </li>
-            ))}
+            {game.game_player
+              .sort((a, b) => (a.seat ?? 0) - (b.seat ?? 0))
+              .map((gamePlayer) => (
+                <li key={gamePlayer.player.id}>
+                  {gamePlayer.player.id === game.winner?.id && "🏆 "}
+                  {gamePlayer.player.name}
+                </li>
+              ))}
           </ul>
         </div>
       ))}

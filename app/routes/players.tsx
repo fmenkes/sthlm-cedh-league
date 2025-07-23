@@ -2,14 +2,25 @@ import { createClient } from "~/utils/supabase.server";
 import type { Route } from "./+types/players";
 
 export async function loader({ request }: Route.LoaderArgs) {
+  const { searchParams } = new URL(request.url);
+  const season = searchParams.get("season");
+
   const { supabase } = createClient(request);
 
-  const { data: players } = await supabase
-    .from("player_win_loss_draw_view")
-    .select()
-    .order("win_percentage", { ascending: false });
+  if (season && !isNaN(Number(season))) {
+    const { data: players } = await supabase
+      .rpc("get_player_stats_by_season", { season_id: Number(season) })
+      .order("win_percentage", { ascending: false });
 
-  return { players };
+    return { players };
+  } else {
+    const { data: players } = await supabase
+      .from("player_win_loss_draw_view")
+      .select()
+      .order("win_percentage", { ascending: false });
+
+    return { players };
+  }
 }
 
 export default function Players({ loaderData }: Route.ComponentProps) {
