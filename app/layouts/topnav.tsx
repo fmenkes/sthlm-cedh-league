@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from "react-router";
 import type { Route } from "./+types/topnav";
 import { createClient } from "~/utils/supabase.server";
+import { useRef } from "react";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { supabase } = createClient(request);
@@ -14,12 +15,84 @@ export async function loader({ request }: Route.LoaderArgs) {
 
 export default function TopNav({ loaderData }: Route.ComponentProps) {
   const { user } = loaderData;
+  const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleDropdownClick = () => {
+    dropdownRef.current?.togglePopover();
+  };
 
   return (
     <>
-      <nav className="navbar bg-gray-800 text-sm md:text-base">
-        <div className="container mx-auto flex justify-between items-center px-4">
-          <ul className="flex space-x-4">
+      <nav className="navbar bg-gray-800 text-lg md:text-base">
+        <div className="dropdown" ref={dropdownRef}>
+          <div tabIndex={0} role="button" className="btn btn-ghost focus:bg-gray-500 lg:hidden text-white">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-5 w-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              {" "}
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M4 6h16M4 12h8m-8 6h16"
+              />{" "}
+            </svg>
+          </div>
+          <ul
+            tabIndex={0}
+            className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
+          >
+            <li>
+              <NavLink to="/" className="text-lg" onClick={handleDropdownClick}>
+                Home
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/players"
+                className="text-lg"
+                onClick={handleDropdownClick}
+              >
+                Players
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/seasons"
+                className="text-lg"
+                onClick={handleDropdownClick}
+              >
+                Seasons
+              </NavLink>
+            </li>
+            <li>
+              <NavLink
+                to="/stats"
+                className="text-lg"
+                onClick={handleDropdownClick}
+              >
+                Stats
+              </NavLink>
+            </li>
+            {user && (
+              <li>
+                <NavLink
+                  to="/report"
+                  className="text-lg"
+                  onClick={handleDropdownClick}
+                >
+                  Report game
+                </NavLink>
+              </li>
+            )}
+          </ul>
+        </div>
+        <div className="container mx-auto flex justify-end lg:justify-between items-center px-4">
+          <ul className="space-x-4 hidden lg:flex">
             <li>
               <NavLink to="/" className="text-white hover:text-gray-300">
                 Home
