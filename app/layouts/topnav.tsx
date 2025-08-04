@@ -35,6 +35,11 @@ export default function TopNav({ loaderData }: Route.ComponentProps) {
                 Seasons
               </NavLink>
             </li>
+            <li>
+              <NavLink to="/stats" className="text-white hover:text-gray-300">
+                Stats
+              </NavLink>
+            </li>
             {user && (
               <li>
                 <NavLink

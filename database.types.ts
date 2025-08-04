@@ -159,6 +159,14 @@ export type Database = {
         }
         Relationships: []
       }
+      seat_win_percentage_view: {
+        Row: {
+          seat: number | null
+          win_percentage: number | null
+          wins: number | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       get_player_stats_by_season: {

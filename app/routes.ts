@@ -11,6 +11,7 @@ export default [
     index("routes/home.tsx"),
     route("login", "routes/login.tsx"),
     route("players", "routes/players.tsx"),
+    route("stats", "routes/stats.tsx"),
     route("report", "routes/report.tsx"),
     ...prefix("seasons", [
       index("routes/seasons/index.tsx"),
