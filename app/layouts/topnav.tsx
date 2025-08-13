@@ -13,6 +13,15 @@ export async function loader({ request }: Route.LoaderArgs) {
   return { user };
 }
 
+const links = [
+  { to: "/", label: "Home" },
+  { to: "/players", label: "Players" },
+  { to: "/seasons", label: "Seasons" },
+  { to: "/stats", label: "Stats" },
+  { to: "/decks", label: "Decks", requiresAuth: true },
+  { to: "/report", label: "Report game", requiresAuth: true },
+];
+
 export default function TopNav({ loaderData }: Route.ComponentProps) {
   const { user } = loaderData;
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -25,7 +34,11 @@ export default function TopNav({ loaderData }: Route.ComponentProps) {
     <>
       <nav className="navbar bg-gray-800 text-lg md:text-base">
         <div className="dropdown" ref={dropdownRef}>
-          <div tabIndex={0} role="button" className="btn btn-ghost focus:bg-gray-500 lg:hidden text-white">
+          <div
+            tabIndex={0}
+            role="button"
+            className="btn btn-ghost focus:bg-gray-500 lg:hidden text-white"
+          >
             <svg
               xmlns="http://www.w3.org/2000/svg"
               className="h-5 w-5"
@@ -46,82 +59,34 @@ export default function TopNav({ loaderData }: Route.ComponentProps) {
             tabIndex={0}
             className="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow"
           >
-            <li>
-              <NavLink to="/" className="text-lg" onClick={handleDropdownClick}>
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/players"
-                className="text-lg"
-                onClick={handleDropdownClick}
-              >
-                Players
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/seasons"
-                className="text-lg"
-                onClick={handleDropdownClick}
-              >
-                Seasons
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/stats"
-                className="text-lg"
-                onClick={handleDropdownClick}
-              >
-                Stats
-              </NavLink>
-            </li>
-            {user && (
-              <li>
-                <NavLink
-                  to="/report"
-                  className="text-lg"
-                  onClick={handleDropdownClick}
-                >
-                  Report game
-                </NavLink>
-              </li>
+            {links.map((link) =>
+              !link.requiresAuth || user ? (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    className="text-lg"
+                    onClick={handleDropdownClick}
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ) : null
             )}
           </ul>
         </div>
         <div className="container mx-auto flex justify-end lg:justify-between items-center px-4">
           <ul className="space-x-4 hidden lg:flex">
-            <li>
-              <NavLink to="/" className="text-white hover:text-gray-300">
-                Home
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/players" className="text-white hover:text-gray-300">
-                Players
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/seasons" className="text-white hover:text-gray-300">
-                Seasons
-              </NavLink>
-            </li>
-            <li>
-              <NavLink to="/stats" className="text-white hover:text-gray-300">
-                Stats
-              </NavLink>
-            </li>
-            {user && (
-              <li>
-                <NavLink
-                  to="/report"
-                  className="text-white hover:text-gray-300"
-                >
-                  Report game
-                </NavLink>
-              </li>
+            {links.map((link) =>
+              !link.requiresAuth || user ? (
+                <li key={link.to}>
+                  <NavLink
+                    to={link.to}
+                    className="text-white hover:text-gray-300"
+                  >
+                    {link.label}
+                  </NavLink>
+                </li>
+              ) : null
             )}
           </ul>
           <ul className="flex space-x-4">

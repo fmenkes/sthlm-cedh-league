@@ -14,6 +14,78 @@ export type Database = {
   }
   public: {
     Tables: {
+      commander: {
+        Row: {
+          art_crop: string | null
+          created_at: string
+          id: number
+          name: string
+          partner: boolean | null
+          scryfall_id: string | null
+          src: string | null
+        }
+        Insert: {
+          art_crop?: string | null
+          created_at?: string
+          id?: number
+          name: string
+          partner?: boolean | null
+          scryfall_id?: string | null
+          src?: string | null
+        }
+        Update: {
+          art_crop?: string | null
+          created_at?: string
+          id?: number
+          name?: string
+          partner?: boolean | null
+          scryfall_id?: string | null
+          src?: string | null
+        }
+        Relationships: []
+      }
+      deck: {
+        Row: {
+          commander: number
+          created_at: string
+          id: number
+          nickname: string | null
+          normalized_pair: string | null
+          partner: number | null
+        }
+        Insert: {
+          commander: number
+          created_at?: string
+          id?: number
+          nickname?: string | null
+          normalized_pair?: string | null
+          partner?: number | null
+        }
+        Update: {
+          commander?: number
+          created_at?: string
+          id?: number
+          nickname?: string | null
+          normalized_pair?: string | null
+          partner?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_commander_fk"
+            columns: ["commander"]
+            isOneToOne: false
+            referencedRelation: "commander"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deck_partner_fk"
+            columns: ["partner"]
+            isOneToOne: false
+            referencedRelation: "commander"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       game: {
         Row: {
           created_at: string
@@ -65,21 +137,38 @@ export type Database = {
       }
       game_player: {
         Row: {
+          deck: number | null
           game_id: number
           player_id: number
           seat: number | null
         }
         Insert: {
+          deck?: number | null
           game_id: number
           player_id: number
           seat?: number | null
         }
         Update: {
+          deck?: number | null
           game_id?: number
           player_id?: number
           seat?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "game_player_deck_fkey"
+            columns: ["deck"]
+            isOneToOne: false
+            referencedRelation: "deck"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_player_deck_fkey"
+            columns: ["deck"]
+            isOneToOne: false
+            referencedRelation: "player_win_loss_draw_view"
+            referencedColumns: ["most_played_deck_id"]
+          },
           {
             foreignKeyName: "game_player_game_id_fkey"
             columns: ["game_id"]
@@ -107,19 +196,37 @@ export type Database = {
         Row: {
           created_at: string
           id: number
+          last_played: number | null
           name: string
         }
         Insert: {
           created_at?: string
           id?: never
+          last_played?: number | null
           name: string
         }
         Update: {
           created_at?: string
           id?: never
+          last_played?: number | null
           name?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "player_last_played_fkey"
+            columns: ["last_played"]
+            isOneToOne: false
+            referencedRelation: "deck"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "player_last_played_fkey"
+            columns: ["last_played"]
+            isOneToOne: false
+            referencedRelation: "player_win_loss_draw_view"
+            referencedColumns: ["most_played_deck_id"]
+          },
+        ]
       }
       season: {
         Row: {
@@ -149,11 +256,14 @@ export type Database = {
     Views: {
       player_win_loss_draw_view: {
         Row: {
+          commander_art_crop: string | null
           draws: number | null
           games_played: number | null
           id: number | null
           losses: number | null
+          most_played_deck_id: number | null
           name: string | null
+          partner_art_crop: string | null
           win_percentage: number | null
           wins: number | null
         }
@@ -179,6 +289,9 @@ export type Database = {
           draws: number
           games_played: number
           win_percentage: number
+          most_played_deck_id: number
+          commander_art_crop: string
+          partner_art_crop: string
         }[]
       }
     }
