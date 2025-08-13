@@ -56,7 +56,7 @@ export default function Players({ loaderData }: Route.ComponentProps) {
           popoverTarget="popover-season"
           style={{ anchorName: "--season-anchor" } as React.CSSProperties}
         >
-          {currentSeason ? currentSeason.name : "All players"}
+          {currentSeason ? currentSeason.name : "All seasons"}
         </button>
 
         <ul
@@ -69,7 +69,7 @@ export default function Players({ loaderData }: Route.ComponentProps) {
           <li key="all-seasons">
             <NavLink
               to="/players"
-              className="no-underline"
+              className="no-underline whitespace-nowrap"
               onClick={() => popoverRef.current?.hidePopover()}
             >
               All players
@@ -79,7 +79,7 @@ export default function Players({ loaderData }: Route.ComponentProps) {
             <li key={season.id}>
               <NavLink
                 to={`?season=${season.id}`}
-                className="no-underline"
+                className="no-underline whitespace-nowrap"
                 onClick={() => popoverRef.current?.hidePopover()}
               >
                 {season.name}
