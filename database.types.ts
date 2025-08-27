@@ -7,7 +7,7 @@ export type Json =
   | Json[]
 
 export type Database = {
-  // Allows to automatically instanciate createClient with right options
+  // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
     PostgrestVersion: "12.2.12 (cd3cf9e)"
@@ -201,13 +201,13 @@ export type Database = {
         }
         Insert: {
           created_at?: string
-          id?: never
+          id?: number
           last_played?: number | null
           name: string
         }
         Update: {
           created_at?: string
-          id?: never
+          id?: number
           last_played?: number | null
           name?: string
         }
@@ -254,6 +254,30 @@ export type Database = {
       }
     }
     Views: {
+      deck_win_percentage: {
+        Row: {
+          deck: number | null
+          total_games: number | null
+          win_percentage: number | null
+          wins: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "game_player_deck_fkey"
+            columns: ["deck"]
+            isOneToOne: false
+            referencedRelation: "deck"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "game_player_deck_fkey"
+            columns: ["deck"]
+            isOneToOne: false
+            referencedRelation: "player_win_loss_draw_view"
+            referencedColumns: ["most_played_deck_id"]
+          },
+        ]
+      }
       player_win_loss_draw_view: {
         Row: {
           commander_art_crop: string | null
@@ -282,16 +306,16 @@ export type Database = {
       get_player_stats_by_season: {
         Args: { season_id: number }
         Returns: {
-          id: number
-          name: string
-          wins: number
-          losses: number
+          commander_art_crop: string
           draws: number
           games_played: number
-          win_percentage: number
+          id: number
+          losses: number
           most_played_deck_id: number
-          commander_art_crop: string
+          name: string
           partner_art_crop: string
+          win_percentage: number
+          wins: number
         }[]
       }
     }

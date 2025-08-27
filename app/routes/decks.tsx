@@ -151,7 +151,21 @@ export async function loader({ request }: Route.LoaderArgs) {
     )
     .order("created_at", { ascending: false });
 
-  return { decks };
+  const { data: deckStats } = await supabase
+    .from("deck_win_percentage")
+    .select("*");
+
+  const merged = decks?.map((deck) => {
+    const stats = deckStats?.find((s) => s.deck === deck.id);
+    return {
+      ...deck,
+      wins: stats?.wins ?? 0,
+      total_games: stats?.total_games ?? 0,
+      win_percentage: stats?.win_percentage ?? 0,
+    };
+  });
+
+  return { decks: merged };
 }
 
 export default function Decks({ loaderData }: Route.ComponentProps) {
@@ -475,6 +489,7 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
                 <h2 className="card-title">{deckName}</h2>
                 <div className="flex flex-row justify-between items-center text-lg">
                   <span>{deck.nickname !== deckName ? deck.nickname : ""}</span>
+                  <span className="text-sm">WR {deck.win_percentage}%</span>
                 </div>
               </div>
             </div>
