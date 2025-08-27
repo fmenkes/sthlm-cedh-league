@@ -72,7 +72,7 @@ export default function Players({ loaderData }: Route.ComponentProps) {
               className="no-underline whitespace-nowrap"
               onClick={() => popoverRef.current?.hidePopover()}
             >
-              All players
+              All seasons
             </NavLink>
           </li>
           {seasons?.map((season) => (
