@@ -60,9 +60,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
         stake += stakeShare;
 
-        if (!game.draw && game.winner?.id !== player.player.id) {
-          standings[player.player.id].score -= stakeShare;
-        }
+        standings[player.player.id].score -= stakeShare;
       }
 
       if (game.winner) {
