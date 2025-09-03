@@ -9,6 +9,9 @@ export function meta({ data }: Route.MetaArgs) {
 }
 
 export async function loader({ params, request }: Route.LoaderArgs) {
+  const { searchParams } = new URL(request.url);
+  const useStakeMethod = searchParams.get("scoringMethod") === "stake";
+
   const { supabase } = createClient(request);
 
   const { data: season } = await supabase
@@ -21,6 +24,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       ends_at,
       game ( 
         id,
+        draw,
         played_at,
         winner ( id, name ),
         game_player (
@@ -41,19 +45,51 @@ export async function loader({ params, request }: Route.LoaderArgs) {
 
   const standings: { [key: number]: { name: string; score: number } } = {};
 
-  for (const game of season.game) {
-    for (const player of game.game_player) {
-      if (!standings[player.player.id]) {
-        standings[player.player.id] = {
-          name: player.player.name!,
-          score: 100,
-        };
+  if (useStakeMethod) {
+    for (const game of season.game) {
+      let stake = 0;
+      for (const player of game.game_player) {
+        if (!standings[player.player.id]) {
+          standings[player.player.id] = {
+            name: player.player.name!,
+            score: 1000,
+          };
+        }
+
+        const stakeShare = Math.round(standings[player.player.id].score * 0.08);
+
+        stake += stakeShare;
+
+        if (!game.draw && game.winner?.id !== player.player.id) {
+          standings[player.player.id].score -= stakeShare;
+        }
       }
 
-      if (game.winner?.id === player.player.id) {
-        standings[player.player.id].score += 3;
+      if (game.winner) {
+        standings[game.winner.id].score += stake;
       } else {
-        standings[player.player.id].score -= 1;
+        for (const player of game.game_player) {
+          standings[player.player.id].score += Math.round(
+            stake / game.game_player.length
+          );
+        }
+      }
+    }
+  } else {
+    for (const game of season.game) {
+      for (const player of game.game_player) {
+        if (!standings[player.player.id]) {
+          standings[player.player.id] = {
+            name: player.player.name!,
+            score: 100,
+          };
+        }
+
+        if (game.winner?.id === player.player.id) {
+          standings[player.player.id].score += 3;
+        } else {
+          standings[player.player.id].score -= 1;
+        }
       }
     }
   }

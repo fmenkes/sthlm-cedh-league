@@ -18,11 +18,19 @@ export default function Seasons({ loaderData }: Route.ComponentProps) {
       <h1 className="text-4xl mb-4">Seasons</h1>
       {(seasons || []).map((season) => (
         <div key={season.id} className="mb-4">
+          {season.name} -{" "}
           <Link
             to={`/seasons/${season.id}`}
             className="underline text-blue-600 visited:text-purple-600"
           >
-            {season.name}
+            Standard
+          </Link>
+          {" | "}
+          <Link
+            to={`/seasons/${season.id}?scoringMethod=stake`}
+            className="underline text-blue-600 visited:text-purple-600"
+          >
+            Stake
           </Link>
         </div>
       ))}
