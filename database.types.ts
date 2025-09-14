@@ -303,6 +303,19 @@ export type Database = {
       }
     }
     Functions: {
+      get_player_deck_stats: {
+        Args: { p_player_id: number } | { p_player_id: string }
+        Returns: {
+          commander_art_crop: string
+          deck_id: number
+          draws: number
+          games_played: number
+          losses: number
+          nickname: string
+          partner_art_crop: string
+          wins: number
+        }[]
+      }
       get_player_stats_by_season: {
         Args: { season_id: number }
         Returns: {

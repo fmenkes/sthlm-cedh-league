@@ -1,7 +1,8 @@
 import { createClient } from "~/utils/supabase.server";
-import type { Route } from "./+types/players";
-import { NavLink, useNavigation } from "react-router";
+import type { Route } from "./+types/index";
+import { Link, NavLink } from "react-router";
 import { useRef } from "react";
+import { UNKNOWN_DECK_IMAGE_URL } from "~/constants";
 
 export async function loader({ request }: Route.LoaderArgs) {
   const { searchParams } = new URL(request.url);
@@ -38,9 +39,6 @@ export async function loader({ request }: Route.LoaderArgs) {
       : null,
   };
 }
-
-const DEFAULT_IMG_URL =
-  "https://cards.scryfall.io/art_crop/front/c/7/c78c2713-39e7-4a6e-a132-027099a89665.jpg?1695757243";
 
 export default function Players({ loaderData }: Route.ComponentProps) {
   const { players, seasons, currentSeason } = loaderData;
@@ -121,14 +119,16 @@ export default function Players({ loaderData }: Route.ComponentProps) {
                   <img
                     className="object-top object-cover h-full w-full rounded-md"
                     style={{ filter: "brightness(50%)" }}
-                    src={DEFAULT_IMG_URL}
+                    src={UNKNOWN_DECK_IMAGE_URL}
                   />
                 </div>
               )}
               <div
                 className={`card-body z-10 relative text-white flex flex-col justify-between`}
               >
-                <h2 className="card-title">{player.name}</h2>
+                <Link to={`/players/${player.id}`}>
+                  <h2 className="card-title">{player.name}</h2>
+                </Link>
                 <div className="flex flex-row justify-between items-center text-lg">
                   <span>
                     {player.wins} / {player.losses} / {player.draws}

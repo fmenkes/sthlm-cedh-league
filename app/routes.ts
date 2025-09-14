@@ -10,10 +10,13 @@ export default [
   layout("layouts/topnav.tsx", [
     index("routes/home.tsx"),
     route("login", "routes/login.tsx"),
-    route("players", "routes/players.tsx"),
     route("stats", "routes/stats.tsx"),
     route("decks", "routes/decks.tsx"),
     route("report", "routes/report.tsx"),
+    ...prefix("players", [
+      index("routes/players/index.tsx"),
+      route(":playerId", "routes/players/player.tsx"),
+    ]),
     ...prefix("seasons", [
       index("routes/seasons/index.tsx"),
       route(":seasonId", "routes/seasons/season.tsx"),
