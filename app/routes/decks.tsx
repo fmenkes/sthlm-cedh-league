@@ -489,7 +489,7 @@ export default function Decks({ loaderData }: Route.ComponentProps) {
                 <h2 className="card-title">{deckName}</h2>
                 <div className="flex flex-row justify-between items-center text-lg">
                   <span>{deck.nickname !== deckName ? deck.nickname : ""}</span>
-                  <span className="text-sm">WR {deck.win_percentage}%</span>
+                  {deck.total_games >= 10 && <span className="text-sm">WR {deck.win_percentage}%</span>}
                 </div>
               </div>
             </div>
