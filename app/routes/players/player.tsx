@@ -89,7 +89,7 @@ export default function Player({ loaderData }: Route.ComponentProps) {
                   <span>
                     Win Percentage:{" "}
                     {deck.games_played > 0
-                      ? ((deck.wins / (deck.games_played - deck.losses)) * 100).toFixed(2)
+                      ? ((deck.wins / (deck.games_played - deck.draws)) * 100).toFixed(2)
                       : "0"}
                     %
                   </span>
