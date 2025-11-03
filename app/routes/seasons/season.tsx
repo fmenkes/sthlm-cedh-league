@@ -24,6 +24,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
       ends_at,
       game ( 
         id,
+        created_at,
         draw,
         played_at,
         winner ( id, name ),
@@ -35,6 +36,7 @@ export async function loader({ params, request }: Route.LoaderArgs) {
     `
     )
     .eq("id", parseInt(params.seasonId))
+    .order("created_at", { referencedTable: "game", ascending: true })
     .single();
 
   if (!season) {
